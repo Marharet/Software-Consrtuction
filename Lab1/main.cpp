@@ -1,16 +1,20 @@
 #include "parser.h"
+#include "parser.cpp"
 
 int main(int argc, char** argv) {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    
     char expstr[80];
     Parser obj;
-    cout << "Для виходу введість крапку.\n";
+    cout << "Enter a period to exit a program.\n";
 
     for (;;) {
-        cout << "Введіть вираз: ";
+        cout << "Enter an expression: ";
         cin.getline(expstr,79);
         if (*expstr=='.')
             break;
-        cout << "Відповідь: "<<obj.eval_exp(expstr) << "\n\n";
+        cout << "Answer: " << obj.evaluateExpression(expstr) << "\n\n";
     }
     return (EXIT_SUCCESS);
 }

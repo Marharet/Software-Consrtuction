@@ -1,149 +1,172 @@
-#include "parser.h"
 
+enum types { DELIMITER = 1, VARIABLE, NUMBER };
+
+// constructor
+Parser::Parser() {
+    expressionPointer = NULL;
+    *token = '\0';
+    tokenType = 0;
+}
 
 void Parser::get_token() {
-    register char *temp;
-    tok_type = 0;
-    temp = token;
+    char *temp = token;
+    tokenType = 0;
     *temp = '\0';
-    if (!*exp_ptr) // стрічка порожня
+    if (!*expressionPointer) // Checking an empty row
         return;
-    while (isspace(*exp_ptr)) // пропускаємо пробіли
-        ++exp_ptr;
-    if (strchr("+-*/%^=()", *exp_ptr)) { // математична дія чи дужка?
-        tok_type = DELIMITER;
-        *temp++ = *exp_ptr++;
-    } else if (isalpha(*exp_ptr)) { // змінна?
-        while (!isdelim (*exp_ptr))
-            *temp++ = *exp_ptr++;
-        tok_type = VARIABLE;
-    } else if (isdigit (*exp_ptr)) { // число?
-        while (!isdelim (*exp_ptr))
-            *temp++ = *exp_ptr++;
-        tok_type = NUMBER;
+    while (isspace(*expressionPointer)) // Skips spaces
+        ++expressionPointer;
+
+    if (strchr("+-*/%^=()", *expressionPointer)) // Checking is it a mathematical operator or a bracket?
+    {
+        tokenType = DELIMITER;
+        *temp++ = *expressionPointer++;
+    }
+    else if (isalpha(*expressionPointer)) // Checking is it a variable?
+    {
+        while (!isDelimiter(*expressionPointer))
+            *temp++ = *expressionPointer++;
+        tokenType = VARIABLE;
+    }
+    else if (isdigit (*expressionPointer)) // Checking is it a number?
+    {
+        while (!isDelimiter(*expressionPointer))
+            *temp++ = *expressionPointer++;
+        tokenType = NUMBER;
     }
     *temp = '\0';
 }
 
-// конструктор
-Parser::Parser() {
-    exp_ptr = NULL;
-}
-// точка входу
-double Parser::eval_exp(char* exp) {
+
+// Entranse point
+double Parser::evaluateExpression(char* exp) {
     double result;
-    exp_ptr = exp;
+    expressionPointer = exp;
     get_token();
-    if (!token) {
-        serror(2); // немає виразу
+    if (!token)
+    {
+        syntaxError(2); // No expression
         return 0.0;
     }
-    eval_exp2(result);
+    evaluateSumAndDifference(result);
     if (*token)
-        serror (0);
+        syntaxError(0);
     return result;
 }
-// Додавання і віднімання двох елементів
-void Parser::eval_exp2(double& result) {
-    register char op;
-    double temp;
-    eval_exp3(result);
-    while ((op=*token) == '+' || op == '-') {
+
+//Adding and subtracting two elements
+void Parser::evaluateSumAndDifference(double& result) {
+    char currentOperator;
+    double currentValue;
+    evaluateMultiplicationAndDivision(result);
+    while ((currentOperator=*token) == '+' || currentOperator == '-') {
         get_token ();
-        eval_exp3(temp);
-        switch (op) {
+        evaluateMultiplicationAndDivision(currentValue);
+        switch (currentOperator)
+        {
             case '-':
-                result = result - temp;
+                result -= currentValue;
                 break;
             case '+':
-                result = result + temp;
+                result += currentValue;
                 break;
         }
     }
 }
-// множення і ділення двох елементів
-void Parser::eval_exp3(double& result) {
-    register char op;
-    double temp;
-    eval_exp4(result);
-    while ((op=*token) == '*' || op=='/' || op == '%') {
+
+// Multiplication and division of two elements
+void Parser::evaluateMultiplicationAndDivision(double& result) {
+    char currentOperator;
+    double currentValue;
+    evaluateExponentiation(result);
+    while ((currentOperator=*token) == '*' || currentOperator=='/' || currentOperator == '%') {
         get_token();
-        eval_exp4(temp);
-        switch (op) {
+        evaluateExponentiation(currentValue);
+        switch (currentOperator)
+        {
             case '*':
-                result = result*temp;
+                result = result * currentValue;
                 break;
             case '/':
-                result = result / temp;
+                result = result / currentValue;
                 break;
             case '%':
-                result = (int) result % (int) temp;
+                result = (int) result % (int) currentValue;
                 break;
         }
     }
 }
-// піднемення до степеня
-void Parser::eval_exp4(double& result) {
-    double temp, ex;
-    register int i;
-    eval_exp5(result);
-    if (*token=='^') {
+
+//Raising to a power
+void Parser::evaluateExponentiation(double& result) {
+    double base, exponent;
+    evaluateUnaryPlusAndMinus(result);
+    if (*token=='^')
+    {
         get_token();
-        eval_exp4(temp);
-        ex = result;
-        if (temp==0.0) {
+        evaluateExponentiation(base);
+        exponent = result;
+        if (base == 0.0)
+        {
             result = 1.0;
             return;
         }
-        for (int t=(int)temp-1; t>0; --t)
-            result =result * (double) ex;
+        for (int t= (int)base - 1; t > 0; --t)
+            result = result * (double) exponent;
     }
 }
-// унарний + та -
-void Parser::eval_exp5(double& result) {
-    register char op;
-    op = 0;
-    if ((tok_type == DELIMITER) && (*token == '+'|| *token == '-')) {
-        op = *token;
+// Unary + and -
+void Parser::evaluateUnaryPlusAndMinus(double& result) {
+    char currentOperator;
+    currentOperator = 0;
+    if ((tokenType == DELIMITER) && (*token == '+' || *token == '-')) {
+        currentOperator = *token;
         get_token();
     }
-    eval_exp6(result);
-    if (op == '-')
+    evaluateParenthesizedExpression(result);
+    if (currentOperator == '-')
         result = - result;
 }
-// обробка виразів в душках
-void Parser::eval_exp6(double& result) {
-    if (*token == '(') { //!!!
+
+// Processing of expressions in brackets
+void Parser::evaluateParenthesizedExpression(double& result) {
+    if (*token == '(')
+    {
         get_token();
-        eval_exp2(result);
+        evaluateSumAndDifference(result);
         if (*token != ')')
-            serror (1);
+            syntaxError(1);
         get_token();
-    } else
-        atom(result);
+    }
+    else
+        evaluateNumericToken(result);
 }
-// отримати значення числа
-void Parser::atom(double& result) {
-    switch (tok_type) {
+
+// Get the value of a number
+void Parser::evaluateNumericToken(double& result) {
+    switch (tokenType)
+    {
         case NUMBER:
             result = atof (token);
             get_token();
             return;
         default:
-            serror(0);
+            syntaxError(0);
     }
 }
-// повідомлення про синтаксичну помилку
-void Parser::serror(int error) {
-    static char *e[] = {
-            "Синтаксична помилка" ,
-            "Незакриті душки",
-            "Немає виразу"
+
+// Syntax error message
+void Parser::syntaxError(int error) {
+    static char *errorMessages[] = {
+            "Syntax error" ,
+            "Open paranthesis",
+            "No expression"
     };
-    cout << e[error] << endl;
+    cout << errorMessages[error] << endl;
 }
-// повертає true, якщо переданий параметр - розділювач
-int Parser::isdelim(char c) {
+
+// Returns true if the passed parameter is a delimiter
+int Parser::isDelimiter(char c) {
     if (strchr(" +-/*%^=()",c) || c==9 || c=='\r' || c==0)
         return 1;
     return 0;

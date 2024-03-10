@@ -15,7 +15,6 @@ enum itemType
 
 class Parser {
 public:
-
     Parser();
     double evaluateExpression(char *exp);
 private:
@@ -39,3 +38,4 @@ private:
     void syntaxError(int error);
     int isDelimiter(char c);
 };
+

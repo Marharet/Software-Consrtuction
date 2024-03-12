@@ -1,9 +1,7 @@
 #include <iostream>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include <windows.h>
 using namespace std;
+
 const int NUMVARS = 26;
 
 enum itemType

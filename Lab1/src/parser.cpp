@@ -1,3 +1,5 @@
+#include "parser.h"
+
 // constructor
 Parser::Parser() {
     expressionPointer = NULL;
@@ -168,9 +170,9 @@ void Parser::evaluateNumericToken(double& result) {
 
 // Syntax error message
 void Parser::syntaxError(int error) {
-    static char *errorMessages[] = {
+    static const char *errorMessages[] = {
             "Syntax error" ,
-            "Open paranthesis",
+            "Open parenthesis",
             "No expression"
     };
     cout << errorMessages[error] << endl;

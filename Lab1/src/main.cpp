@@ -1,5 +1,5 @@
-#include "../src/parser.h"
-#include "../src/parser.cpp"
+#include "parser.h"
+//#include "../src/parser.cpp"
 
 int main(int argc, char** argv) {
     SetConsoleCP(1251);

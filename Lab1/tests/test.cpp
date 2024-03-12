@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cassert>
-#include "../src/parser.h"
 #include "../src/parser.cpp"
 
 int main() {

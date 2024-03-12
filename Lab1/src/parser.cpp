@@ -194,10 +194,12 @@ double Parser::findVariable (char *s) {
 }
 
 // Number processing or assignment
+// коментар українською
 void Parser::numberProcessingOrAssignment(double& result) {
     int slot;
     char ttok_type;
     char temp_token[80];
+
 
     if (tokenType == VARIABLE)
     {

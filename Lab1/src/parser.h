@@ -1,5 +1,6 @@
 #include <iostream>
-#include <windows.h>
+#include <cstring>
+#include <cmath>
 using namespace std;
 
 const int NUMVARS = 26;
@@ -14,7 +15,7 @@ enum itemType
 class Parser {
 public:
     Parser();
-    double evaluateExpression(char *exp);
+    double evaluateExpression(string exp_str);
 private:
     char *expressionPointer; // вказівник на вираз
     char token[80]; // поточний елемент

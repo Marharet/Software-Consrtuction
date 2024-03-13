@@ -16,10 +16,14 @@ void Parser::get_token() {
     char *temp = token;
     tokenType = 0;
     *temp = '\0';
+
+    // Skipping spaces
+    while (*expressionPointer == ' ')
+        ++expressionPointer;
+
     if (!*expressionPointer) // Checking an empty row
         return;
-    while (isspace(*expressionPointer)) // Skips spaces
-        ++expressionPointer;
+
 
     if (strchr("+-*/%^=()", *expressionPointer)) // Checking is it a mathematical operator or a bracket?
     {
@@ -43,13 +47,26 @@ void Parser::get_token() {
 
 
 // Entranse point
-double Parser::evaluateExpression(char* exp) {
+double Parser::evaluateExpression(string exp_str) {
+    char exp[80];
+    if (exp_str.length() > 79)
+    {
+        syntaxError(3);
+    }
+    strcpy(exp, exp_str.c_str());
+
     double result;
-    expressionPointer = exp;
-    get_token();
-    if (!token)
+    if (strlen(exp) == 0)
     {
         syntaxError(2); // No expression
+        return 0.0;
+    }
+    expressionPointer = exp;
+    get_token();
+
+    if (strlen(token) == 0)
+    {
+        syntaxError(2);
         return 0.0;
     }
     if (tokenType == VARIABLE)
@@ -173,7 +190,8 @@ void Parser::syntaxError(int error) {
     static const char *errorMessages[] = {
             "Syntax error" ,
             "Open parenthesis",
-            "No expression"
+            "No expression",
+            "Long expression"
     };
     cout << errorMessages[error] << endl;
 }

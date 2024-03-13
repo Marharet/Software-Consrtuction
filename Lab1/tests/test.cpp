@@ -2,57 +2,57 @@
 #include <cassert>
 #include "../src/parser.cpp"
 
+
 int main() {
     Parser parser;
 
-    // Test 1
+    // testForAddition
     char* input = "15-3";
     double expected_result = 12;
     double parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 2
+    // testForDivisionAndMultiplication
     input = "2*5/10";
     expected_result = 1;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 3
+    // testForDivision
     input = "15/3";
     expected_result = 5;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 4
+    // testForMultiplication
     input = "5*0";
     expected_result = 0;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 5
+    // testForSeveralActions
     input = "18/2*3+1";
     expected_result = 28;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 6
+    // testForExponentiation
     input = "5^0";
     expected_result = 1;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 7
+    // testForCheckingPriority
     input = "(12+3)*2-10";
     expected_result = 20;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
 
-    // Test 8
+    // testForProcessingOrAssignment
     input = "x=10";
     expected_result = 10;
     parsed_value = parser.evaluateExpression(input);
     assert(parsed_value == expected_result);
-
 
     std::cout << "All tests passed successfully!" << std::endl;
 

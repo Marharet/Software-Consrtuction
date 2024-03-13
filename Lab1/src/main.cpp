@@ -1,5 +1,4 @@
-#include "parser.cpp"
-
+#include "parser.h"
 
 int main(int argc, char** argv) {
 

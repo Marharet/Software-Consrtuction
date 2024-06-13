@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+group = 'org.src'
+version = 'v0.1.0'
+
+application {
+    mainClass = 'org.src.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.github.stefanbirkner:system-lambda:1.2.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set('VisualBasicCompiler')
+    archiveVersion.set(version)
+    archiveClassifier.set('all')
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
+}
+
+tasks.named('jar').configure {
+    enabled = false
+}

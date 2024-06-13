@@ -1,0 +1,2 @@
+This program computes the volume of a cube.
+Volume is       1000.0

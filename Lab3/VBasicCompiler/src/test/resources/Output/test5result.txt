@@ -1,0 +1,4 @@
+This demonstrates all of the relational operators.
+A <> B
+A < B
+A <= B
